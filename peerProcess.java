@@ -1,14 +1,18 @@
 package com;
 
-import com.FileProcessor.FileManagerExecutor;
-import com.logger.EventLogger;
-
-import java.io.*;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+// import java.util.LinkedList;
+// import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import com.FileProcessor.FileManagerExecutor;
+import com.logger.EventLogger;
 
 public class peerProcess {
 	private static Peer peerReference;
@@ -142,7 +146,7 @@ public class peerProcess {
 		peerProcess.transferDone = completed;
 	}
 
-	private static void readCommonConfigFile() throws IOException {
+	/*private static void readCommonConfigFile() throws IOException {
 		BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(Constants.common)));
 
 		String s;
@@ -168,6 +172,60 @@ public class peerProcess {
 			peerReference.idealBitset.set(i);
 
 		bufferedReader.close();
+	}*/
+	
+	private static void readCommonConfigFile() throws IOException {
+		File file = new File(Constants.common);
+    	try
+    	{
+    		Scanner s = new Scanner(file);	
+	    while(s.hasNextLine())
+	    {
+			//System.out.println("in while loop");
+	    	String parameterName = s.next();
+			//System.out.println(parameterName);
+	    	if(parameterName.equals("NumberOfPreferredNeighbors"))
+	    	{
+				//System.out.println("NumberOfPreferredNeighbors");
+	    		int noofneighbors = s.nextInt();
+	    		Constants.setNumberOfPreferredNeighbors(noofneighbors);
+	    	}
+	    	else if(parameterName.equals("UnchokingInterval"))
+	    	{
+	    		int UnchokingInterval = s.nextInt();
+	    		Constants.setUnchokingInterval(UnchokingInterval);		
+	    	}
+	    	else if(parameterName.equals("OptimisticUnchokingInterval"))
+	    	{
+	    		int OptimisticUnchokingInterval = s.nextInt();
+	    		Constants.setOptimisticUnchokingInterval(OptimisticUnchokingInterval);
+	    	}
+	    	else if(parameterName.equals("FileName"))
+	    	{
+	    		String nameoffile = s.next();
+	    		Constants.setFileName(nameoffile);
+	    	}
+	    	else if(parameterName.equals("FileSize"))
+	    	{
+	    		int FileSize = s.nextInt();
+	    		Constants.setFileSize(FileSize);
+	    	}
+	    	else if(parameterName.equals("PieceSize"))
+	    	{
+	    		int sizeofPiece = s.nextInt();
+	    		Constants.setPieceSize(sizeofPiece);
+	    	}
+    	
+    }
+    peerReference.set_pieceCount();
+    for (int i = 0; i < peerReference.get_pieceCount(); i++)
+        peerReference.idealBitset.set(i);
+	    s.close();
+    }
+    catch(RuntimeException exc)
+    	{
+    		System.out.println("There are errors in given file");
+    	}
 	}
 
 	private static void readPeerConfigFile(int current) throws IOException {
