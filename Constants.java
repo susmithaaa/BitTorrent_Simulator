@@ -5,7 +5,7 @@ public class Constants {
     static final String common = root + "/com/Common.cfg";
     static final String peers = root + "/com/PeerInfo.cfg";
 
-    public static final String HANDSHAKEHEADER = "P2PFILESHARINGPROJ";
+    // public static final String HANDSHAKEHEADER = "P2PFILESHARINGPROJ";
     public static final String ZERO_BITS = "0000000000";
 
     private static Integer NumberOfPreferredNeighbors;
