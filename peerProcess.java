@@ -2,6 +2,7 @@ package com;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,6 +19,7 @@ public class peerProcess {
 	private static Peer peerReference;
 	private static boolean transferDone;
 	public static EventLogger log;
+	static int fileSize, sizeOfPiece;
 
 	public static void main(String[] args) throws IOException {
 		
@@ -37,7 +39,7 @@ public class peerProcess {
 			// saifil added
 			static void parseInput(int temp) throws IOException
 			{
-				FileManagerExecutor fileManagerExecutor = new FileManagerExecutor();
+				// FileManagerExecutor fileManagerExecutor = new FileManagerExecutor();
 				peerReference = Peer.getPeerInstance();
 					try {
 						readCommonConfigFile();
@@ -60,8 +62,8 @@ public class peerProcess {
 							if (!verifyFilePresent(peerReference.get_peerID())) {
 								throw new RuntimeException("No file found in directory which is supposed to have the file");
 							}
-							fileManagerExecutor.fileSplit(new File(Constants.root + "/peer_" + String.valueOf(peerReference.get_peerID())
-							+ "/" + Constants.getFileName()), Constants.getPieceSize());
+							fileSplit(new File(Constants.root + "/peer_" + String.valueOf(peerReference.get_peerID())
+							+ "/" + Constants.getFileName()), sizeOfPiece);
 						}
 					} catch (FileNotFoundException fileNotfoundException) {
 						// TODO Log
@@ -207,13 +209,13 @@ public class peerProcess {
 	    	}
 	    	else if(parameterName.equals("FileSize"))
 	    	{
-	    		int FileSize = s.nextInt();
-	    		Constants.setFileSize(FileSize);
+	    		fileSize = s.nextInt();
+	    		Constants.setFileSize(fileSize);
 	    	}
 	    	else if(parameterName.equals("PieceSize"))
 	    	{
-	    		int sizeofPiece = s.nextInt();
-	    		Constants.setPieceSize(sizeofPiece);
+	    		sizeOfPiece = s.nextInt();
+	    		Constants.setPieceSize(sizeOfPiece);
 	    	}
     	
     }
@@ -251,6 +253,9 @@ public class peerProcess {
 				} else {
 					peerReference.peersToConnectTo.put(currPeerID, remote);
 				}
+				
+				// current<currPeerID ? peerReference.peersToExpectConnectionsFrom.put(currPeerID, remote):peerReference.peersToConnectTo.put(currPeerID, remote);
+				
 				peerReference.expected++;
 //				peer.connectedPeers.add(remote);
 			}
@@ -275,5 +280,37 @@ public class peerProcess {
 		if (!file.exists()) {
 			file.mkdir();
 		}
+	}
+	
+	
+	private static void fileSplit(File inputFile, int pieceSize) {
+		// wholeFileSplitIntoMap = Collections.synchronizedMap(new HashMap<>());
+		FileInputStream inputStream;
+		int SizeOfFile, remainingSizeOfFile, writePieceIntoByteArray, count = 0;
+		byte[] filePiece;
+		try {
+			inputStream = new FileInputStream(inputFile);
+			SizeOfFile = fileSize;
+			remainingSizeOfFile = SizeOfFile;
+			while (SizeOfFile > 0) {
+				/*if (remainingSizeOfFile < pieceSize) {
+					filePiece = new byte[remainingSizeOfFile];
+				} else {
+					filePiece = new byte[pieceSize];
+				}*/
+				
+				filePiece = remainingSizeOfFile < pieceSize ? new byte[remainingSizeOfFile] : new byte[pieceSize];
+				
+				writePieceIntoByteArray = inputStream.read(filePiece);
+				SizeOfFile = SizeOfFile - writePieceIntoByteArray;
+				remainingSizeOfFile = remainingSizeOfFile - pieceSize;
+				FileManagerExecutor.wholeFileSplitIntoMap.put(count, filePiece);
+				count++;
+			}
+			inputStream.close();
+		} catch (IOException exec) {
+			exec.printStackTrace();
+		}
+
 	}
 }

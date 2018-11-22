@@ -2,6 +2,7 @@ package com.FileProcessor;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import com.Constants;
 import com.Peer;
@@ -10,67 +11,55 @@ import com.messages.MessageUtil;
 
 public class FileManagerExecutor {
 
-	static Map<Integer, byte[]> pieceMap;
-	static Map<Integer, byte[]> fileSoFar = Collections.synchronizedMap(new TreeMap<>());
+	public static Map<Integer, byte[]> wholeFileSplitIntoMap = Collections.synchronizedMap(new HashMap<>());;
+	static Map<Integer, byte[]> trackReceivedFilePieces = Collections.synchronizedMap(new TreeMap<>());
 
-	public void fileSplit(File inputFile, int pieceSize) {
-		pieceMap = Collections.synchronizedMap(new HashMap<>());
-		FileInputStream inputStream;
-		int fileSize;
-		int remainingFileSize;
-		int bytesRead, count = 0;
-		byte[] filePiece;
-		try {
-			inputStream = new FileInputStream(inputFile);
-			fileSize = Constants.getFileSize();
-			remainingFileSize = fileSize;
-			while (fileSize > 0) {
-				if (remainingFileSize < pieceSize) {
-					filePiece = new byte[remainingFileSize];
-				} else {
-					filePiece = new byte[pieceSize];
-				}
-				bytesRead = inputStream.read(filePiece);
-				fileSize -= bytesRead;
-				pieceMap.put(count, filePiece);
-				count++;
-				remainingFileSize -= pieceSize;
-			}
-			inputStream.close();
-		} catch (java.io.IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public byte[] getFilePart(int filePartNumber) {
-		if (fileSoFar.get(filePartNumber) == null)
-			return pieceMap.get(filePartNumber);
+	public byte[] getFilePart(int filePieceIndex) {
+		/*if (trackReceivedFilePieces.get(filePartNumber) == null)
+			return wholeFileSplitIntoMap.get(filePartNumber);
 		else
-			return fileSoFar.get(filePartNumber);
+			return trackReceivedFilePieces.get(filePartNumber);
+		*/
+		byte[] resultPart = trackReceivedFilePieces.get(filePieceIndex) != null ? trackReceivedFilePieces.get(filePieceIndex) : 
+															   wholeFileSplitIntoMap.get(filePieceIndex);
+		
+		return resultPart;
 	}
 
 	public void acceptFilePart(int filePart, Message message) {
 		byte[] payLoadWithIndex = message.getPayloadOfMessage();
 		byte[] payLoad = MessageUtil.removeFourBytes(payLoadWithIndex);
-		fileSoFar.put(filePart, payLoad);
+		trackReceivedFilePieces.put(filePart, payLoad);
 	}
 
 	public void filesmerge() throws IOException {
-		FileOutputStream fileOutputStream;
-		File mergeFile = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"
-				+ Constants.getFileName());
+		FileOutputStream fOS;
+		// File mergeFile = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"
+				//+ Constants.getFileName());
 		byte[] combinedFile = new byte[Constants.getFileSize()];
 		int count= 0;
-		for (Map.Entry<Integer, byte[]> e : fileSoFar.entrySet()) {
-			for(int i=0;i<e.getValue().length;i++){
-				combinedFile[count] = e.getValue()[i];
+		for (Map.Entry<Integer, byte[]> e : trackReceivedFilePieces.entrySet()) {
+			byte temp[] = e.getValue();
+			int len = temp.length;
+			for(int i=0;i<len;i++){
+				combinedFile[count] = temp[i];
 				count++;
 			}
 		}
-		fileOutputStream = new FileOutputStream(mergeFile);
-		fileOutputStream.write(combinedFile);
-		fileOutputStream.flush();
-		fileOutputStream.close();
+		/*int temp = 0;
+		while(temp<trackReceivedFilePieces.entrySet().size())
+		{
+			Map.Entry<Integer, byte[]> ex = (Entry<Integer, byte[]>) trackReceivedFilePieces.entrySet();
+			for(int i=0;i<ex.getValue().length;i++){
+				combinedFile[count] = ex.getValue()[i];
+				count++;
+			}
+		}*/
+		
+		fOS = new FileOutputStream(new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"
+				+ Constants.getFileName()));
+		fOS.write(combinedFile);
+		fOS.flush();
+		fOS.close();
 	}
 }
