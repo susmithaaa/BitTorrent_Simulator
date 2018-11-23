@@ -4,7 +4,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.BitSet;
 
-public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
+public class RemotePeerInfo implements Comparable<RemotePeerInfo> {
 	private int _peerID;
 	private String _hostName;
 	private int _portNo;

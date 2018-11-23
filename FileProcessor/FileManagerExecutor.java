@@ -15,14 +15,15 @@ public class FileManagerExecutor {
 	static Map<Integer, byte[]> trackReceivedFilePieces = Collections.synchronizedMap(new TreeMap<>());
 
 	public byte[] getFilePart(int filePieceIndex) {
-		/*if (trackReceivedFilePieces.get(filePartNumber) == null)
-			return wholeFileSplitIntoMap.get(filePartNumber);
-		else
-			return trackReceivedFilePieces.get(filePartNumber);
-		*/
-		byte[] resultPart = trackReceivedFilePieces.get(filePieceIndex) != null ? trackReceivedFilePieces.get(filePieceIndex) : 
-															   wholeFileSplitIntoMap.get(filePieceIndex);
-		
+		/*
+		 * if (trackReceivedFilePieces.get(filePartNumber) == null) return
+		 * wholeFileSplitIntoMap.get(filePartNumber); else return
+		 * trackReceivedFilePieces.get(filePartNumber);
+		 */
+		byte[] resultPart = trackReceivedFilePieces.get(filePieceIndex) != null
+				? trackReceivedFilePieces.get(filePieceIndex)
+				: wholeFileSplitIntoMap.get(filePieceIndex);
+
 		return resultPart;
 	}
 
@@ -34,30 +35,28 @@ public class FileManagerExecutor {
 
 	public void filesmerge() throws IOException {
 		FileOutputStream fOS;
-		// File mergeFile = new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"
-				//+ Constants.getFileName());
+		// File mergeFile = new File(Constants.root + "/peer_" +
+		// String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"
+		// + Constants.getFileName());
 		byte[] combinedFile = new byte[Constants.getFileSize()];
-		int count= 0;
+		int count = 0;
 		for (Map.Entry<Integer, byte[]> e : trackReceivedFilePieces.entrySet()) {
 			byte temp[] = e.getValue();
 			int len = temp.length;
-			for(int i=0;i<len;i++){
+			for (int i = 0; i < len; i++) {
 				combinedFile[count] = temp[i];
 				count++;
 			}
 		}
-		/*int temp = 0;
-		while(temp<trackReceivedFilePieces.entrySet().size())
-		{
-			Map.Entry<Integer, byte[]> ex = (Entry<Integer, byte[]>) trackReceivedFilePieces.entrySet();
-			for(int i=0;i<ex.getValue().length;i++){
-				combinedFile[count] = ex.getValue()[i];
-				count++;
-			}
-		}*/
-		
-		fOS = new FileOutputStream(new File(Constants.root + "/peer_" + String.valueOf(Peer.getPeerInstance().get_peerID()) + "/"
-				+ Constants.getFileName()));
+		/*
+		 * int temp = 0; while(temp<trackReceivedFilePieces.entrySet().size()) {
+		 * Map.Entry<Integer, byte[]> ex = (Entry<Integer, byte[]>)
+		 * trackReceivedFilePieces.entrySet(); for(int i=0;i<ex.getValue().length;i++){
+		 * combinedFile[count] = ex.getValue()[i]; count++; } }
+		 */
+
+		fOS = new FileOutputStream(new File(Constants.root + "/peer_"
+				+ String.valueOf(Peer.getPeerInstance().get_peerID()) + "/" + Constants.getFileName()));
 		fOS.write(combinedFile);
 		fOS.flush();
 		fOS.close();

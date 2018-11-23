@@ -22,123 +22,118 @@ public class peerProcess {
 	static int fileSize, sizeOfPiece;
 
 	public static void main(String[] args) throws IOException {
-		
+
 		// transferDone = false;
-		
+
 		// transferDone = false;
-				if (args.length == 0) 
-				{
-					// do nothing
+		if (args.length == 0) {
+			// do nothing
+		} else {
+			parseInput(Integer.parseInt(args[0]));
+		}
+	}
+
+	// saifil added
+	static void parseInput(int temp) throws IOException {
+		// FileManagerExecutor fileManagerExecutor = new FileManagerExecutor();
+		peerReference = Peer.getPeerInstance();
+		try {
+			readCommonConfigFile();
+		} catch (FileNotFoundException fileNotfoundException) {
+			// TODO Log
+			fileNotfoundException.printStackTrace();
+		}
+		/*
+		 * saifil -> no need of below finally finally { // TODO Log successful setting
+		 * of vars }
+		 */
+		try {
+			// saifil added temp variable to read input parameter
+			// int temp = Integer.parseInt(args[0]);
+			readPeerConfigFile(temp);
+			if (peerReference.get_hasFile() != 1) {
+				createNewFolder();
+			} else {
+				peerReference.setBitset();
+				if (!verifyFilePresent(peerReference.get_peerID())) {
+					throw new RuntimeException("No file found in directory which is supposed to have the file");
 				}
-				else
-				{
-					parseInput(Integer.parseInt(args[0]));
-				}
+				fileSplit(new File(Constants.root + "/peer_" + String.valueOf(peerReference.get_peerID()) + "/"
+						+ Constants.getFileName()), sizeOfPiece);
 			}
+		} catch (FileNotFoundException fileNotfoundException) {
+			// TODO Log
+			fileNotfoundException.printStackTrace();
+		}
+		/*
+		 * saifil -> no need of below finally finally { // TODO Log successful setting
+		 * of vars }
+		 */
 
-			// saifil added
-			static void parseInput(int temp) throws IOException
-			{
-				// FileManagerExecutor fileManagerExecutor = new FileManagerExecutor();
-				peerReference = Peer.getPeerInstance();
-					try {
-						readCommonConfigFile();
-					} catch (FileNotFoundException fileNotfoundException) {
-						// TODO Log
-						fileNotfoundException.printStackTrace();
-					} 
-					/* saifil -> no need of below finally
-					finally {
-						// TODO Log successful setting of vars
-					}*/
-					try {
-						// saifil added temp variable to read input parameter
-						// int temp = Integer.parseInt(args[0]);
-						readPeerConfigFile(temp);
-						if (peerReference.get_hasFile() != 1) {
-							createNewFolder();
-						} else {
-							peerReference.setBitset();
-							if (!verifyFilePresent(peerReference.get_peerID())) {
-								throw new RuntimeException("No file found in directory which is supposed to have the file");
-							}
-							fileSplit(new File(Constants.root + "/peer_" + String.valueOf(peerReference.get_peerID())
-							+ "/" + Constants.getFileName()), sizeOfPiece);
-						}
-					} catch (FileNotFoundException fileNotfoundException) {
-						// TODO Log
-						fileNotfoundException.printStackTrace();
-					}  
-					/*
-					saifil -> no need of below finally
-					finally {
-						// TODO Log successful setting of vars
-					}*/
+		startServerThread();
+		startClientThreads();
 
-					ScheduledThreadPoolExecutor InstantiateIncomingServerThreads = new ScheduledThreadPoolExecutor(1);
+		/*
+		 * ScheduledThreadPoolExecutor InstantiateIncomingServerThreads = new
+		 * ScheduledThreadPoolExecutor(1);
+		 * 
+		 * InstantiateIncomingServerThreads.schedule(() -> { Server server = new
+		 * Server(); new Thread(server).start(); }, 0, TimeUnit.MILLISECONDS);
+		 * 
+		 * ScheduledThreadPoolExecutor InstantiateOutgoingClientThreads = new
+		 * ScheduledThreadPoolExecutor(1);
+		 * 
+		 * InstantiateOutgoingClientThreads.schedule(() -> { Client client = new
+		 * Client(peerReference.peersToConnectTo); new Thread(client).start(); }, 1,
+		 * TimeUnit.MILLISECONDS);
+		 */
 
-					InstantiateIncomingServerThreads.schedule(() -> {
-						Server server = new Server();
-						new Thread(server).start();
-					}, 0, TimeUnit.MILLISECONDS);
+		peerReference.PreferredNeighbours();
+		peerReference.OptimisticallyUnchokedNeighbour();
+	}
 
-					ScheduledThreadPoolExecutor InstantiateOutgoingClientThreads = new ScheduledThreadPoolExecutor(1);
+	static void startServerThread() {
+		ScheduledThreadPoolExecutor InstantiateIncomingServerThreads = new ScheduledThreadPoolExecutor(1);
+		InstantiateIncomingServerThreads.schedule(() -> {
+			Server server = new Server();
+			new Thread(server).start();
+		}, 0, TimeUnit.MILLISECONDS);
+	}
 
-					InstantiateOutgoingClientThreads.schedule(() -> {
-						Client client = new Client(peerReference.peersToConnectTo);
-						new Thread(client).start();
-					}, 1, TimeUnit.MILLISECONDS);
-
-					peerReference.PreferredNeighbours();
-					peerReference.OptimisticallyUnchokedNeighbour();
-			}
-
-		
-		/* if (args.length > 0) {
-			peerReference = Peer.getPeerInstance();
-			try {
-				setCommonConfigVars();
-			} catch (FileNotFoundException fileNotfoundException) {
-				// TODO Log
-				fileNotfoundException.printStackTrace();
-			} finally {
-				// TODO Log successful setting of vars
-			}
-			try {
-				buildRemotePeersList(Integer.parseInt(args[0]));
-				if (peerReference.get_hasFile() == 1) {
-					peerReference.setBitset();
-					if (!checkFileExists(peerReference.get_peerID())) {
-						throw new RuntimeException("No file found in peer which is supposed to have the file");
-					}
-					fileManagerExecutor.fileSplit(new File(Constants.root + "/peer_" + String.valueOf(peerReference.get_peerID())
-					+ "/" + Constants.getFileName()), Constants.getPieceSize());
-				} else {
-					createDirectory();
-				}
-			} catch (FileNotFoundException fileNotfoundException) {
-				// TODO Log
-		//		fileNotfoundException.printStackTrace();
-			} finally {
-				// TODO Log successful setting of vars
-			}
-
-			ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
-			executor.schedule(() -> {
-				Server server = new Server();
-				new Thread(server).start();
-			}, 0, TimeUnit.MILLISECONDS);
-
-//			executor = new ScheduledThreadPoolExecutor(1);
-			executor.schedule(() -> {
-				Client client = new Client(peerReference.peersToConnectTo);
-				new Thread(client).start();
-			}, 1, TimeUnit.MILLISECONDS);
-
-			 Peer.getPeerInstance().PreferredNeighbours();
-	         Peer.getPeerInstance().OptimisticallyUnchokedNeighbour();
-		}*/
-
+	static void startClientThreads() {
+		ScheduledThreadPoolExecutor InstantiateOutgoingClientThreads = new ScheduledThreadPoolExecutor(1);
+		InstantiateOutgoingClientThreads.schedule(() -> {
+			Client client = new Client(peerReference.peersToConnectTo);
+			new Thread(client).start();
+		}, 1, TimeUnit.MILLISECONDS);
+	}
+	/*
+	 * if (args.length > 0) { peerReference = Peer.getPeerInstance(); try {
+	 * setCommonConfigVars(); } catch (FileNotFoundException fileNotfoundException)
+	 * { // TODO Log fileNotfoundException.printStackTrace(); } finally { // TODO
+	 * Log successful setting of vars } try {
+	 * buildRemotePeersList(Integer.parseInt(args[0])); if
+	 * (peerReference.get_hasFile() == 1) { peerReference.setBitset(); if
+	 * (!checkFileExists(peerReference.get_peerID())) { throw new
+	 * RuntimeException("No file found in peer which is supposed to have the file");
+	 * } fileManagerExecutor.fileSplit(new File(Constants.root + "/peer_" +
+	 * String.valueOf(peerReference.get_peerID()) + "/" + Constants.getFileName()),
+	 * Constants.getPieceSize()); } else { createDirectory(); } } catch
+	 * (FileNotFoundException fileNotfoundException) { // TODO Log //
+	 * fileNotfoundException.printStackTrace(); } finally { // TODO Log successful
+	 * setting of vars }
+	 * 
+	 * ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
+	 * executor.schedule(() -> { Server server = new Server(); new
+	 * Thread(server).start(); }, 0, TimeUnit.MILLISECONDS);
+	 * 
+	 * // executor = new ScheduledThreadPoolExecutor(1); executor.schedule(() -> {
+	 * Client client = new Client(peerReference.peersToConnectTo); new
+	 * Thread(client).start(); }, 1, TimeUnit.MILLISECONDS);
+	 * 
+	 * Peer.getPeerInstance().PreferredNeighbours();
+	 * Peer.getPeerInstance().OptimisticallyUnchokedNeighbour(); }
+	 */
 
 	static boolean isFileTransferDone() {
 		return transferDone;
@@ -148,86 +143,70 @@ public class peerProcess {
 		peerProcess.transferDone = completed;
 	}
 
-	/*private static void readCommonConfigFile() throws IOException {
-		BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(Constants.common)));
+	/*
+	 * private static void readCommonConfigFile() throws IOException {
+	 * BufferedReader bufferedReader = new BufferedReader(new FileReader(new
+	 * File(Constants.common)));
+	 * 
+	 * String s; String[] t;
+	 * 
+	 * List<String> commonList = new LinkedList<>();
+	 * 
+	 * while ((s = bufferedReader.readLine()) != null) { t = s.split(" ");
+	 * commonList.add(t[1]); }
+	 * 
+	 * Constants.setNumberOfPreferredNeighbors(Integer.parseInt(commonList.get(0)));
+	 * Constants.setUnchokingInterval(Integer.parseInt(commonList.get(1)));
+	 * Constants.setOptimisticUnchokingInterval(Integer.parseInt(commonList.get(2)))
+	 * ; Constants.setFileName(commonList.get(3));
+	 * Constants.setFileSize(Integer.parseInt(commonList.get(4)));
+	 * Constants.setPieceSize(Integer.parseInt(commonList.get(5)));
+	 * 
+	 * peerReference.set_pieceCount();
+	 * 
+	 * for (int i = 0; i < peerReference.get_pieceCount(); i++)
+	 * peerReference.idealBitset.set(i);
+	 * 
+	 * bufferedReader.close(); }
+	 */
 
-		String s;
-		String[] t;
-
-		List<String> commonList = new LinkedList<>();
-
-		while ((s = bufferedReader.readLine()) != null) {
-			t = s.split(" ");
-			commonList.add(t[1]);
-		}
-
-		Constants.setNumberOfPreferredNeighbors(Integer.parseInt(commonList.get(0)));
-		Constants.setUnchokingInterval(Integer.parseInt(commonList.get(1)));
-		Constants.setOptimisticUnchokingInterval(Integer.parseInt(commonList.get(2)));
-		Constants.setFileName(commonList.get(3));
-		Constants.setFileSize(Integer.parseInt(commonList.get(4)));
-		Constants.setPieceSize(Integer.parseInt(commonList.get(5)));
-
-		peerReference.set_pieceCount();
-
-		for (int i = 0; i < peerReference.get_pieceCount(); i++)
-			peerReference.idealBitset.set(i);
-
-		bufferedReader.close();
-	}*/
-	
 	private static void readCommonConfigFile() throws IOException {
 		File file = new File(Constants.common);
-    	try
-    	{
-    		Scanner s = new Scanner(file);	
-	    while(s.hasNextLine())
-	    {
-			//System.out.println("in while loop");
-	    	String parameterName = s.next();
-			//System.out.println(parameterName);
-	    	if(parameterName.equals("NumberOfPreferredNeighbors"))
-	    	{
-				//System.out.println("NumberOfPreferredNeighbors");
-	    		int noofneighbors = s.nextInt();
-	    		Constants.setNumberOfPreferredNeighbors(noofneighbors);
-	    	}
-	    	else if(parameterName.equals("UnchokingInterval"))
-	    	{
-	    		int UnchokingInterval = s.nextInt();
-	    		Constants.setUnchokingInterval(UnchokingInterval);		
-	    	}
-	    	else if(parameterName.equals("OptimisticUnchokingInterval"))
-	    	{
-	    		int OptimisticUnchokingInterval = s.nextInt();
-	    		Constants.setOptimisticUnchokingInterval(OptimisticUnchokingInterval);
-	    	}
-	    	else if(parameterName.equals("FileName"))
-	    	{
-	    		String nameoffile = s.next();
-	    		Constants.setFileName(nameoffile);
-	    	}
-	    	else if(parameterName.equals("FileSize"))
-	    	{
-	    		fileSize = s.nextInt();
-	    		Constants.setFileSize(fileSize);
-	    	}
-	    	else if(parameterName.equals("PieceSize"))
-	    	{
-	    		sizeOfPiece = s.nextInt();
-	    		Constants.setPieceSize(sizeOfPiece);
-	    	}
-    	
-    }
-    peerReference.set_pieceCount();
-    for (int i = 0; i < peerReference.get_pieceCount(); i++)
-        peerReference.idealBitset.set(i);
-	    s.close();
-    }
-    catch(RuntimeException exc)
-    	{
-    		System.out.println("There are errors in given file");
-    	}
+		try {
+			Scanner s = new Scanner(file);
+			while (s.hasNextLine()) {
+				// System.out.println("in while loop");
+				String parameterName = s.next();
+				// System.out.println(parameterName);
+				if (parameterName.equals("NumberOfPreferredNeighbors")) {
+					// System.out.println("NumberOfPreferredNeighbors");
+					int noofneighbors = s.nextInt();
+					Constants.setNumberOfPreferredNeighbors(noofneighbors);
+				} else if (parameterName.equals("UnchokingInterval")) {
+					int UnchokingInterval = s.nextInt();
+					Constants.setUnchokingInterval(UnchokingInterval);
+				} else if (parameterName.equals("OptimisticUnchokingInterval")) {
+					int OptimisticUnchokingInterval = s.nextInt();
+					Constants.setOptimisticUnchokingInterval(OptimisticUnchokingInterval);
+				} else if (parameterName.equals("FileName")) {
+					String nameoffile = s.next();
+					Constants.setFileName(nameoffile);
+				} else if (parameterName.equals("FileSize")) {
+					fileSize = s.nextInt();
+					Constants.setFileSize(fileSize);
+				} else if (parameterName.equals("PieceSize")) {
+					sizeOfPiece = s.nextInt();
+					Constants.setPieceSize(sizeOfPiece);
+				}
+
+			}
+			peerReference.set_pieceCount();
+			for (int i = 0; i < peerReference.get_pieceCount(); i++)
+				peerReference.idealBitset.set(i);
+			s.close();
+		} catch (RuntimeException exc) {
+			System.out.println("There are errors in given file");
+		}
 	}
 
 	private static void readPeerConfigFile(int current) throws IOException {
@@ -253,11 +232,13 @@ public class peerProcess {
 				} else {
 					peerReference.peersToConnectTo.put(currPeerID, remote);
 				}
-				
-				// current<currPeerID ? peerReference.peersToExpectConnectionsFrom.put(currPeerID, remote):peerReference.peersToConnectTo.put(currPeerID, remote);
-				
+
+				// current<currPeerID ?
+				// peerReference.peersToExpectConnectionsFrom.put(currPeerID,
+				// remote):peerReference.peersToConnectTo.put(currPeerID, remote);
+
 				peerReference.expected++;
-//				peer.connectedPeers.add(remote);
+				// peer.connectedPeers.add(remote);
 			}
 		}
 
@@ -268,7 +249,7 @@ public class peerProcess {
 		File f = new File(Constants.root + "/peer_" + String.valueOf(peerID) + "/" + Constants.getFileName());
 		boolean res = false;
 		if (!f.exists()) {
-	//		throw new FileNotFoundException("Required File not found");
+			// throw new FileNotFoundException("Required File not found");
 		} else {
 			res = true;
 		}
@@ -281,8 +262,7 @@ public class peerProcess {
 			file.mkdir();
 		}
 	}
-	
-	
+
 	private static void fileSplit(File inputFile, int pieceSize) {
 		// wholeFileSplitIntoMap = Collections.synchronizedMap(new HashMap<>());
 		FileInputStream inputStream;
@@ -293,14 +273,13 @@ public class peerProcess {
 			SizeOfFile = fileSize;
 			remainingSizeOfFile = SizeOfFile;
 			while (SizeOfFile > 0) {
-				/*if (remainingSizeOfFile < pieceSize) {
-					filePiece = new byte[remainingSizeOfFile];
-				} else {
-					filePiece = new byte[pieceSize];
-				}*/
-				
+				/*
+				 * if (remainingSizeOfFile < pieceSize) { filePiece = new
+				 * byte[remainingSizeOfFile]; } else { filePiece = new byte[pieceSize]; }
+				 */
+
 				filePiece = remainingSizeOfFile < pieceSize ? new byte[remainingSizeOfFile] : new byte[pieceSize];
-				
+
 				writePieceIntoByteArray = inputStream.read(filePiece);
 				SizeOfFile = SizeOfFile - writePieceIntoByteArray;
 				remainingSizeOfFile = remainingSizeOfFile - pieceSize;
