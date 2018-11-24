@@ -34,20 +34,14 @@ public class peerProcess {
 	}
 
 	// saifil added
-	static void parseInput(int temp) throws IOException {
+	static void parseInput(int temp) throws IOException, FileNotFoundException {
 		// FileManagerExecutor fileManagerExecutor = new FileManagerExecutor();
 		peerReference = Peer.getPeerInstance();
-		try {
 			readCommonConfigFile();
-		} catch (FileNotFoundException fileNotfoundException) {
-			// TODO Log
-			fileNotfoundException.printStackTrace();
-		}
 		/*
 		 * saifil -> no need of below finally finally { // TODO Log successful setting
 		 * of vars }
 		 */
-		try {
 			// saifil added temp variable to read input parameter
 			// int temp = Integer.parseInt(args[0]);
 			readPeerConfigFile(temp);
@@ -61,10 +55,7 @@ public class peerProcess {
 				fileSplit(new File(Constants.root + "/peer_" + String.valueOf(peerReference.get_peerID()) + "/"
 						+ Constants.getFileName()), sizeOfPiece);
 			}
-		} catch (FileNotFoundException fileNotfoundException) {
-			// TODO Log
-			fileNotfoundException.printStackTrace();
-		}
+		
 		/*
 		 * saifil -> no need of below finally finally { // TODO Log successful setting
 		 * of vars }
