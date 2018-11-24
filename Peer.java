@@ -201,8 +201,8 @@ public class Peer {
 
 			try {
 				if (!this.preferredNeighbours.containsKey(this.optimisticallyUnchokedNeighbour)) {
-					peerCommunicationHelper.sendMessage(this.optimisticallyUnchokedNeighbour.objectOutputStream,
-							MessageType.choke);
+					peerCommunicationHelper.sendMessage(MessageType.choke,
+							this.optimisticallyUnchokedNeighbour.objectOutputStream);
 					this.optimisticallyUnchokedNeighbour.setState(MessageType.choke);
 				}
 
@@ -211,7 +211,7 @@ public class Peer {
 			}
 
 			try {
-				peerCommunicationHelper.sendMessage(optimisticPeer.objectOutputStream, MessageType.unchoke);
+				peerCommunicationHelper.sendMessage(MessageType.unchoke, optimisticPeer.objectOutputStream);
 				optimisticPeer.setState(MessageType.unchoke);
 
 			} catch (Exception e) {
@@ -328,7 +328,7 @@ public class Peer {
 		if ((r != null ? r.getState() : null) == MessageType.choke) {
 			try {
 
-				peerCommunicationHelper.sendMessage(r.objectOutputStream, MessageType.unchoke);
+				peerCommunicationHelper.sendMessage(MessageType.unchoke, r.objectOutputStream);
 				r.setState(MessageType.unchoke);
 				System.out.println("unchoke sent to" + r.get_peerID() + "from" + Peer.getPeerInstance().get_peerID());
 			} catch (Exception e) {
@@ -339,7 +339,7 @@ public class Peer {
 
 	private void choker(RemotePeerInfo r) {
 		try {
-			peerCommunicationHelper.sendMessage(r.objectOutputStream, MessageType.choke);
+			peerCommunicationHelper.sendMessage(MessageType.choke, r.objectOutputStream);
 			r.setState(MessageType.choke);
 			System.out.println("choke sent to" + r.get_peerID() + "from" + Peer.getPeerInstance().get_peerID());
 

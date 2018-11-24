@@ -85,7 +85,7 @@ public class PeerCommunication {
 					this.remotePeerReference);
 			byte msgType = message.getTypeOfMessage();
 			byte[] msgPayloadReceived = message.getPayloadOfMessage();
-			byte[] msgLength = message.getLengthOfMessage();
+			// byte[] msgLength = message.getLengthOfMessage();
 
 			if (this.flag && msgType != (byte) 7) {
 				this.downloadStartTime = 0L;
@@ -137,7 +137,7 @@ public class PeerCommunication {
 			case (byte) 4: {
 				this.remotePeerReference.getBitfield().set(MessageUtil.byteArrayToInt(msgPayloadReceived));
 				if (!Peer.getPeerInstance().getBitSet().get(MessageUtil.byteArrayToInt(msgPayloadReceived))) {
-					peerCommunicationHelper.sendMessage(this.outputStreamReference, MessageType.interested);
+					peerCommunicationHelper.sendMessage(MessageType.interested, this.outputStreamReference);
 					// PeerCommunicationHelper.sendRequestMsg(this.out,msgPayloadReceived);
 				}
 				break;
@@ -222,7 +222,7 @@ public class PeerCommunication {
 		this.flag = true;
 	}
 	if (pieceIndex == -1) {
-		peerCommunicationHelper.sendMessage(this.outputStreamReference, MessageType.notinterested);
+		peerCommunicationHelper.sendMessage(MessageType.notinterested, this.outputStreamReference);
 	}
 	}
 	
@@ -233,10 +233,10 @@ public class PeerCommunication {
 		this.remotePeerReference.setBitfield(bitset);
 		if (peerCommunicationHelper.isInterseted(this.remotePeerReference.getBitfield(),
 				Peer.getPeerInstance().getBitSet())) {
-			peerCommunicationHelper.sendMessage(this.outputStreamReference, MessageType.interested);
+			peerCommunicationHelper.sendMessage(MessageType.interested, this.outputStreamReference);
 			// PeerCommunicationHelper.sendRequestMsg(this.out, this.remote);
 		} else {
-			peerCommunicationHelper.sendMessage(this.outputStreamReference, MessageType.notinterested);
+			peerCommunicationHelper.sendMessage(MessageType.notinterested, this.outputStreamReference);
 		}
 	}
 	
