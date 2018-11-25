@@ -213,8 +213,8 @@ public class PeerCommunication {
 	{
 	System.out.println("Unchoke received from " + this.remotePeerReference.get_peerID() + " to "
 			+ Peer.getPeerInstance().get_peerID());
-	int pieceIndex = peerCommunicationHelper.getPieceIndex(this.remotePeerReference.getBitfield(),
-			Peer.getPeerInstance().getBitSet());
+	int pieceIndex = peerCommunicationHelper.getPieceIndex(Peer.getPeerInstance().getBitSet(),
+			this.remotePeerReference.getBitfield());
 	if (pieceIndex != -1) {
 		peerCommunicationHelper.sendRequestMsg(this.outputStreamReference,
 				MessageUtil.intToByteArray(pieceIndex));
@@ -275,8 +275,8 @@ public class PeerCommunication {
 			}
 			Peer.getPeerInstance().sendHaveToAll(MessageUtil.byteArrayToInt(pieceIndexField));
 		}
-		int pieceIndex = peerCommunicationHelper.getPieceIndex(this.remotePeerReference.getBitfield(),
-				Peer.getPeerInstance().getBitSet());
+		int pieceIndex = peerCommunicationHelper.getPieceIndex(Peer.getPeerInstance().getBitSet(),
+				this.remotePeerReference.getBitfield());
 		;
 		peerCommunicationHelper.sendRequestMsg(this.outputStreamReference,
 				MessageUtil.intToByteArray(pieceIndex));

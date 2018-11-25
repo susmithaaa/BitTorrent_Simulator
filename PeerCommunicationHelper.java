@@ -15,7 +15,8 @@ public class PeerCommunicationHelper {
 
 	public Message sendMessage(MessageType messageType, ObjectOutputStream out) throws Exception {
 		MessageHandler messageHandler = new MessageHandler(messageType);
-		Message message = messageHandler.buildMessage();
+		// Message message = messageHandler.buildMessage();
+		Message message = buildCoreMessage(messageHandler);
 		/*out.writeObject(message);
 		out.flush();*/
 		writeObj(out, message);
@@ -26,7 +27,8 @@ public class PeerCommunicationHelper {
 	public Message sendBitSetMsg(ObjectOutputStream out) throws Exception {
 		MessageHandler messageHandler = new MessageHandler(MessageType.bitfield,
 				MessageUtil.toByteArray(Peer.getPeerInstance().getBitSet()));
-		Message message = messageHandler.buildMessage();
+		// Message message = messageHandler.buildMessage();
+		Message message = buildCoreMessage(messageHandler);
 		/*out.writeObject(message);
 		out.flush();*/
 		writeObj(out, message);
@@ -35,7 +37,8 @@ public class PeerCommunicationHelper {
 
 	public Message sendRequestMsg(ObjectOutputStream out, byte[] pieceIndex) throws Exception {
 		MessageHandler messageHandler = new MessageHandler(MessageType.request, pieceIndex);
-		Message message = messageHandler.buildMessage();
+		// Message message = messageHandler.buildMessage();
+		Message message = buildCoreMessage(messageHandler);
 		/*out.writeObject(message);
 		out.flush();*/
 		writeObj(out, message);
@@ -45,7 +48,8 @@ public class PeerCommunicationHelper {
 	public Message sendHaveMsg(ObjectOutputStream out, int recentReceivedPieceIndex) throws Exception {
 		MessageHandler messageHandler = new MessageHandler(MessageType.have,
 				MessageUtil.intToByteArray(recentReceivedPieceIndex));
-		Message message = messageHandler.buildMessage();
+		// Message message = messageHandler.buildMessage();
+		Message message = buildCoreMessage(messageHandler);
 		/*out.writeObject(message);
 		out.flush();*/
 		writeObj(out, message);
@@ -58,7 +62,8 @@ public class PeerCommunicationHelper {
 		byte[] payload = fileManagerExecutor.getFilePart(pieceIndex);
 		byte[] payloadWithIndex = MessageUtil.concatenateByteArrays(index, payload);
 		MessageHandler messageHandler = new MessageHandler(MessageType.piece, payloadWithIndex);
-		Message message = messageHandler.buildMessage();
+		// Message message = messageHandler.buildMessage();
+		Message message = buildCoreMessage(messageHandler);
 		/*out.writeObject(message);
 		out.flush();*/
 		writeObj(out, message);
@@ -85,6 +90,11 @@ public class PeerCommunicationHelper {
 	{
 		o.writeObject(m);
 		o.flush();
+	}
+	
+	Message buildCoreMessage(MessageHandler mh) throws Exception
+	{
+		return mh.buildMessage();
 	}
 	
 
@@ -138,7 +148,7 @@ public class PeerCommunicationHelper {
 	return false;
 	}
 
-	public synchronized int getPieceIndex(BitSet remote, BitSet current) {
+	public synchronized int getPieceIndex(BitSet current, BitSet remote) {
 		// below condition checks remote and current peer for either they both are empty
 		// or they both have the same pieces
 		if (checkEmptyOrSameRemoteandCurrentPeerBitset(remote, current))
@@ -169,6 +179,6 @@ public class PeerCommunicationHelper {
 		 return ((r.isEmpty() && c.isEmpty()) || r.equals(c));
 		// no need to check if current is empty or not, coz we are looking for pieces 
 		// which remote has and current does not
-		//return (r.isEmpty() || r.equals(c));
+		// return (r.isEmpty() || r.equals(c));
 	}
 }
