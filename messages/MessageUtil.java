@@ -1,7 +1,7 @@
 package com.messages;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
+//import java.io.BufferedInputStream;
+// import java.io.IOException;
 import java.util.BitSet;
 
 public class MessageUtil {
@@ -55,22 +55,14 @@ public class MessageUtil {
 		return result;
 	}
 
-	public static byte[] readBytes(BufferedInputStream in, byte[] byteArray, int length) throws IOException {
-		int len = length;
-		int idx = 0;
-		while (len != 0) {
-			int dataAvailableLength = in.available();
-			int read = Math.min(len, dataAvailableLength);
-			byte[] dataRead = new byte[read];
-			if (read != 0) {
-				in.read(dataRead);
-				byteArray = MessageUtil.concatenateByteArrays(byteArray, idx, dataRead, read);
-				idx += read;
-				len -= read;
-			}
-		}
-		return byteArray;
-	}
+	/*
+	 * public static byte[] readBytes(BufferedInputStream in, byte[] byteArray, int
+	 * length) throws IOException { int len = length; int idx = 0; while (len != 0)
+	 * { int dataAvailableLength = in.available(); int read = Math.min(len,
+	 * dataAvailableLength); byte[] dataRead = new byte[read]; if (read != 0) {
+	 * in.read(dataRead); byteArray = MessageUtil.concatenateByteArrays(byteArray,
+	 * idx, dataRead, read); idx += read; len -= read; } } return byteArray; }
+	 */
 
 	public static BitSet fromByteArray(byte[] bytes) {
 		BitSet bits = new BitSet();
