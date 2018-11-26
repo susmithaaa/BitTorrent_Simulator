@@ -8,15 +8,19 @@ public class MessageUtil {
 
 	public static byte[] concatenateByteArrays(byte[] a, byte[] b) {
 		byte[] result = new byte[a.length + b.length];
-		System.arraycopy(a, 0, result, 0, a.length);
-		System.arraycopy(b, 0, result, a.length, b.length);
+		copyArrayFixed(result, a);
+		// System.arraycopy(a, 0, result, 0, a.length);
+		// System.arraycopy(b, 0, result, a.length, b.length);
+		copyArrayVariable(result, b, a.length);
 		return result;
 	}
 
 	public static byte[] concatenateByteArrays(byte[] a, int aLength, byte[] b, int bLength) {
 		byte[] result = new byte[aLength + bLength];
-		System.arraycopy(a, 0, result, 0, aLength);
-		System.arraycopy(b, 0, result, aLength, bLength);
+		copyArrayFixed(result, a);
+		// System.arraycopy(a, 0, result, 0, aLength);
+		// System.arraycopy(b, 0, result, aLength, bLength);
+		copyArrayVariable(result, b, aLength);
 		return result;
 	}
 
@@ -84,18 +88,32 @@ public class MessageUtil {
 
 	public static byte[] removeFourBytes(byte[] a) {
 		byte[] actualPayload = new byte[a.length - 4];
-		for (int i = 4; i < a.length; i++) {
+		/*for (int i = 4; i < a.length; i++) {
 			actualPayload[i - 4] = a[i];
 			a[i - 4] = a[i];
-		}
+		}*/
+		
+		 System.arraycopy(a, 4, actualPayload, 0, a.length-4);
+		
 		return actualPayload;
 	}
 
-	public static byte[] getPieceIndexFromPayload(byte[] a) {
+	static void copyArrayFixed(byte[] res, byte[] first)
+	{
+		// return new byte[5];
+		System.arraycopy(first, 0, res, 0, first.length);
+	}
+	
+	static void copyArrayVariable(byte[] res, byte[] second, int first_length)
+	{
+		System.arraycopy(second, 0, res, first_length, second.length);
+	}
+	
+	/*public static byte[] getPieceIndexFromPayload(byte[] a) {
 		byte[] pieceIndex = new byte[4];
 		for (int i = 0; i < 4; i++) {
 			pieceIndex[i] = a[i];
 		}
 		return pieceIndex;
-	}
+	}*/
 }
