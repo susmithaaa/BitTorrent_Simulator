@@ -26,25 +26,31 @@ public class MessageUtil {
 
 	public static byte[] intToByteArray(int a) {
 		byte[] ret = new byte[4];
-		ret[3] = (byte) (a & 0xFF);
-		ret[2] = (byte) ((a >> 8) & 0xFF);
-		ret[1] = (byte) ((a >> 16) & 0xFF);
-		ret[0] = (byte) ((a >> 24) & 0xFF);
+		int _2 =  (255 & (a >> 8));
+		int _1 =  (255 & (a >> 16));
+		int _3 =  (255 & a);
+		int _0 =  (255 & (a >> 24));
+		
+		ret[2] = (byte) _2;
+		ret[1] = (byte) _1;
+		ret[3] = (byte) _3;
+		ret[0] = (byte) _0;
 		return ret;
 	}
 
 	public static int byteArrayToInt(byte[] b) {
 		int value = 0;
 		for (int i = 0; i < 4; i++) {
-			int shift = (4 - 1 - i) * 8;
-			value += (b[i] & 0x000000FF) << shift;
+			int shift = (4 - i -1) * 8;
+			value += (255 & b[i]) << shift;
 		}
 		return value;
 	}
 
 	public static byte[] concatenateByte(byte[] a, byte b) {
 		byte[] result = new byte[a.length + 1];
-		System.arraycopy(a, 0, result, 0, a.length);
+		// System.arraycopy(a, 0, result, 0, a.length);
+		copyArrayFixed(result, a);
 		result[a.length] = b;
 		return result;
 	}
@@ -68,8 +74,12 @@ public class MessageUtil {
 
 	public static BitSet fromByteArray(byte[] bytes) {
 		BitSet bits = new BitSet();
-		for (int i = 0; i < bytes.length * 8; i++) {
-			if ((bytes[bytes.length - i / 8 - 1] & (1 << (i % 8))) > 0) {
+		int temp = 8;
+		int len = bytes.length;
+		int mul = temp * len;
+		int _1 = 1;
+		for (int i = 0; i < mul; i++) {
+			if (((1 << (i % temp)) & (bytes[len - i / temp - _1])) > 0) {
 				bits.set(i);
 			}
 		}
@@ -77,10 +87,12 @@ public class MessageUtil {
 	}
 
 	public static byte[] toByteArray(BitSet bits) {
-		byte[] bytes = new byte[bits.length() / 8 + 1];
+		int temp = 8;
+		int _1 = 1;
+		byte[] bytes = new byte[bits.length() / temp + _1];
 		for (int i = 0; i < bits.length(); i++) {
 			if (bits.get(i)) {
-				bytes[bytes.length - i / 8 - 1] |= 1 << (i % 8);
+				bytes[bytes.length - i / temp - _1] |= 1 << (i % temp);
 			}
 		}
 		return bytes;
