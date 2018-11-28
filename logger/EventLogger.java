@@ -1,5 +1,120 @@
 /*package com.logger;
 
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import com.Constants;
+import com.RemotePeerInfo;
+
+public class EventLogger {
+
+	int peerID;
+	protected final String logFile;
+
+	SimpleDateFormat simpleFormate = new SimpleDateFormat("MM/dd-HH:mm:ss");
+
+	public EventLogger(int peerID) {
+		// logWriter = new Logger(peer_ID);
+		this.peerID = peerID;
+		// this.logFile = Constants.root + "\\peer_" + peerID + "\\" + "log_peer_" + peerID + ".log";
+		this.logFile = Constants.root + "/" + "log_peer_" + peerID + ".log";
+		// System.out.println(this.logFile);
+	}
+
+	public void TCPConnection(int peer_ID, boolean isConnectionMakingPeer) {
+		String message;
+		if (isConnectionMakingPeer) {
+			message = String.format("%s: Connected to %d.\n", simpleFormate.format(new Date()), peer_ID);
+		} else {
+			message = String.format("%s: Connected from %d.\n", simpleFormate.format(new Date()), peer_ID);
+		}
+		loggerWrite(logFile, message);
+	}
+
+	public void changeOfPreferredNeighbors(Map<RemotePeerInfo, BitSet> PreferredNeighborsMap) {
+		String neighborsString = "";
+		for (Map.Entry<RemotePeerInfo, BitSet> entry : PreferredNeighborsMap.entrySet()) {
+			neighborsString += entry.getKey().get_peerID() + ",";
+		}
+		changeOfPreferredNeighbors(neighborsString.substring(0, neighborsString.length() - 1));
+	}
+
+	private void changeOfPreferredNeighbors(String preferredNeighbors) {
+		String message = String.format("%s: Current preferred Neighbors %s.\n", simpleFormate.format(new Date()),
+				preferredNeighbors);
+		loggerWrite(logFile, message);
+	}
+
+	public void changeOfOptimisticallyUnchokedNeighbor(int unchockedNeighborID) {
+		String message = String.format("%s: Added with Optimistcally UN_CHOKED neighbor %d.\n",
+				simpleFormate.format(new Date()), unchockedNeighborID);
+		loggerWrite(logFile, message);
+	}
+
+	public void unchoking(int peer_ID) {
+		String message = String.format("%s: Is UN_CHOKED by %d.\n", simpleFormate.format(new Date()), peer_ID);
+		loggerWrite(logFile, message);
+	}
+
+	public void choking(int peer_ID) {
+		String message = String.format("%s: Is CHOKED by %d.\n", simpleFormate.format(new Date()), peer_ID);
+		loggerWrite(logFile, message);
+	}
+
+	public void have(int peer_ID, int pieceIndex) {
+		String message = String.format("%s: Received the HAVE message from %d for piece %d.\n",
+				simpleFormate.format(new Date()), peer_ID, pieceIndex);
+		loggerWrite(logFile, message);
+	}
+
+	public void interested(int peer_ID) {
+		String message = String.format("%s: Received the INTERESTED message from %d.\n",
+				simpleFormate.format(new Date()), peer_ID);
+		loggerWrite(logFile, message);
+	}
+
+	public void notInterested(int peer_ID) {
+		String message = String.format("%s: Received the NOT INTERESTED message from %d.\n",
+				simpleFormate.format(new Date()), peer_ID);
+		loggerWrite(logFile, message);
+	}
+
+	public void downloadAPiece(int peer_ID, int pieceIndex, int numberOfPieces) {
+		String message = String.format(
+				"%s: Peer %d downloaded the piece %d from %d. Current number of pieces downloaded are: %d.\n",
+				simpleFormate.format(new Date()), peerID, pieceIndex, peer_ID, numberOfPieces);
+		loggerWrite(logFile, message);
+	}
+
+	public void completionOfDownload() {
+		String message = String.format("%s: Peer %d downloaded the complete file.\n", simpleFormate.format(new Date()),
+				peerID);
+		loggerWrite(logFile, message);
+	}
+
+	private void loggerWrite(String logfile, String message) {
+		try {
+			// logWriter.log(null, msg);
+			File logger = new File(logfile);
+			if (!logger.exists()) {
+				logger.createNewFile();
+			}
+
+			FileOutputStream fout = new FileOutputStream(logger, true);
+			fout.write(message.getBytes());
+			fout.flush();
+			fout.close();
+			
+		} catch (IOException exc) {
+			// exc.printStackTrace();
+		}
+	}
+}*/
+
+
+/*package com.logger;
+
 import java.io.IOException;
 import java.util.BitSet;
 import java.util.Map;
@@ -47,17 +162,17 @@ public class EventLogger {
 	}
 
 	public void have(int peer_ID, int pieceIndex) {
-		String msg = " received the â€˜haveâ€™ message from " + peer_ID + " for the piece " + pieceIndex + ".";
+		String msg = " received the ‘have’ message from " + peer_ID + " for the piece " + pieceIndex + ".";
 		write(msg);
 	}
 
 	public void interested(int peer_ID) {
-		String msg = " received the â€˜interestedâ€™ message from " + peer_ID + ".";
+		String msg = " received the ‘interested’ message from " + peer_ID + ".";
 		write(msg);
 	}
 
 	public void notInterested(int peer_ID) {
-		String msg = " received the â€˜not interestedâ€™ message from " + peer_ID + ".";
+		String msg = " received the ‘not interested’ message from " + peer_ID + ".";
 		write(msg);
 	}
 
@@ -82,7 +197,6 @@ public class EventLogger {
 
 }*/
 
-
 package com.logger;
 
 import java.io.File;
@@ -97,108 +211,114 @@ import java.util.Map;
 import com.Constants;
 import com.RemotePeerInfo;
 
-public class EventLogger
-{
-    // public Logger logWriter;
-    
-    int peerID;
-    protected final String logFile;
-    
-    SimpleDateFormat simpleFormate = new SimpleDateFormat ("MM/dd -- HH:mm:ss");
+public class EventLogger {
+	// public Logger logWriter;
 
-    public EventLogger(int peerID){
-        //logWriter = new Logger(peer_ID);
-    	this.peerID = peerID;
-        this.logFile = Constants.root + "/"+"log_peer_"+peerID+".log";
-    }
+	int peerID;
+	protected final String logFile;
 
-    public void TCPConnection(int peer_ID, boolean isConnectionMakingPeer){
-    	String message;
-        if(isConnectionMakingPeer) {
-        	message= String.format("%s: Connected to %d.\n", simpleFormate.format(new Date()), peer_ID);
-        }
-        else {
-        	message= String.format("%s: Connected from %d.\n", simpleFormate.format(new Date()), peer_ID);
-        }
-        loggerWrite(logFile, message);
-    }
+	SimpleDateFormat simpleFormate = new SimpleDateFormat("MM/dd : HH:mm:ss");
 
-    public void changeOfPreferredNeighbors(Map<RemotePeerInfo, BitSet> PreferredNeighborsMap){
-        String neighborsString = "";
-        for(Map.Entry<RemotePeerInfo, BitSet> entry: PreferredNeighborsMap.entrySet()){
-        	neighborsString += entry.getKey().get_peerID() + ",";
-        }
-        changeOfPreferredNeighbors(neighborsString.substring(0,neighborsString.length()-1));
-    }
-    private void changeOfPreferredNeighbors(String preferredNeighbors){
-        String message= String.format("%s: Current preferred Neighbors %s.\n", simpleFormate.format(new Date()), preferredNeighbors);
-        loggerWrite(logFile, message);
-    }
+	public EventLogger(int peerID) {
+		// logWriter = new Logger(peer_ID);
+		this.peerID = peerID;
+		this.logFile = Constants.root + "/" + "log_peer_" + peerID + ".log";
+	}
 
-    public void changeOfOptimisticallyUnchokedNeighbor(int unchockedNeighborID){
-        String message= String.format("%s: Added with Optimistcally UN_CHOKED neighbor %d.\n", simpleFormate.format(new Date()), unchockedNeighborID);
-        loggerWrite(logFile, message);
-    }
+	public void TCPConnection(int peer_ID, boolean isConnectionMakingPeer) {
+		String message;
+		if (isConnectionMakingPeer) {
+			message = String.format("%s: Peer %d makes a connection to %d.\n", simpleFormate.format(new Date()), peerID, peer_ID);
+		} else {
+			message = String.format("%s: Peer %d is connected from %d.\n", simpleFormate.format(new Date()), peerID, peer_ID);
+		}
+		loggerWrite(logFile, message);
+	}
 
-    public void unchoking(int peer_ID){
-        String message= String.format("%s: Is UN_CHOKED by %d.\n", simpleFormate.format(new Date()), peer_ID);
-        loggerWrite(logFile, message);
-    }
+	public void changeOfPreferredNeighbors(Map<RemotePeerInfo, BitSet> PreferredNeighborsMap) {
+		String neighborsString = "";
+		for (Map.Entry<RemotePeerInfo, BitSet> entry : PreferredNeighborsMap.entrySet()) {
+			neighborsString += entry.getKey().get_peerID() + ",";
+		}
+		changeOfPreferredNeighbors(neighborsString.substring(0, neighborsString.length() - 1));
+	}
 
-    public void choking(int peer_ID){
-        String message= String.format("%s: Is CHOKED by %d.\n", simpleFormate.format(new Date()), peer_ID);
-        loggerWrite(logFile, message);
-    }
+	private void changeOfPreferredNeighbors(String preferredNeighbors) {
+		String message = String.format("%s: Peer %d has the Preferred Neighbors %s.\n", simpleFormate.format(new Date()),
+				peerID,preferredNeighbors);
+		loggerWrite(logFile, message);
+	}
 
-    public void have(int peer_ID, int pieceIndex){
-        String message= String.format("%s: Received the HAVE message from %d for piece %d.\n", simpleFormate.format(new Date()), peer_ID, pieceIndex);
-        loggerWrite(logFile, message);
-    }
+	public void changeOfOptimisticallyUnchokedNeighbor(int unchockedNeighborID) {
+		String message = String.format("%s: Peer %d has the Optimistically Unchoked Neighbor %d.\n",
+				simpleFormate.format(new Date()), peerID, unchockedNeighborID);
+		loggerWrite(logFile, message);
+	}
 
-    public void interested(int peer_ID){
-        String message= String.format("%s: Received the INTERESTED message from %d.\n", simpleFormate.format(new Date()), peer_ID);
-        loggerWrite(logFile, message);
-    }
+	public void unchoking(int peer_ID) {
+		String message = String.format("%s: Peer %d is Unchoked by %d.\n", simpleFormate.format(new Date()), peerID, peer_ID);
+		loggerWrite(logFile, message);
+	}
 
-    public void notInterested(int peer_ID){
-        String message= String.format("%s: Received the NOT INTERESTED message from %d.\n", simpleFormate.format(new Date()), peer_ID);
-        loggerWrite(logFile, message);
-    }
+	public void choking(int peer_ID) {
+		String message = String.format("%s: Peer %d is Choked by %d.\n", simpleFormate.format(new Date()), peerID, peer_ID);
+		loggerWrite(logFile, message);
+	}
 
-    public void downloadAPiece(int peer_ID, int pieceIndex, int numberOfPieces){
-        String message= String.format("%s: Peer %d downloaded the piece %d from %d. Current number of pieces downloaded are: %d.\n", simpleFormate.format(new Date()), peerID, pieceIndex, peer_ID, numberOfPieces);
-        loggerWrite(logFile, message);
-    }
+	public void have(int peer_ID, int pieceIndex) {
+		String message = String.format("%s: Peer %d received the Have message from %d for piece %d.\n",
+				simpleFormate.format(new Date()), peerID, peer_ID, pieceIndex);
+		loggerWrite(logFile, message);
+	}
 
-    public void completionOfDownload(){
-    	String message= String.format("%s: Peer %d downloaded the complete file.\n", simpleFormate.format(new Date()), peerID);
-        loggerWrite(logFile, message);
-    }
+	public void interested(int peer_ID) {
+		String message = String.format("%s: Peer %d received the Interested message from %d.\n",
+				simpleFormate.format(new Date()), peerID, peer_ID);
+		loggerWrite(logFile, message);
+	}
 
-    private void loggerWrite(String logfile, String message) {
-        try {
-            //logWriter.log(null, msg);
-        	File logger=new File(logfile);
-        	if(!logger.exists()) {
-        		logger.createNewFile();
-        	}
-        	
-        	FileOutputStream fout= new FileOutputStream(logger, true);
-        	fout.write(message.getBytes());
-        	fout.flush();
-        	fout.close();
-        	/*Date newdate = new Date( );
-            SimpleDateFormat simpleFormate = new SimpleDateFormat ("HH:mm:ss");
-            String curTime = simpleFormate.format(newdate);
-            FileWriter fileWrite = new FileWriter(logFile, true);
-            fileWrite.write(curTime + ": Peer " + peerID + message + "\n");
-            fileWrite.flush();
-            fileWrite.close();*/
-        } catch (IOException exc) {
-            exc.printStackTrace();
-        }
-    }
+	public void notInterested(int peer_ID) {
+		String message = String.format("%s: Peer %d received the Not Interested message from %d.\n",
+				simpleFormate.format(new Date()), peerID, peer_ID);
+		loggerWrite(logFile, message);
+	}
+
+	public void downloadAPiece(int peer_ID, int pieceIndex, int numberOfPieces) {
+		String message = String.format(
+				"%s: Peer %d downloaded the piece %d from %d. Current number of pieces it has is %d.\n",
+				simpleFormate.format(new Date()), peerID, pieceIndex, peer_ID, numberOfPieces);
+		loggerWrite(logFile, message);
+	}
+
+	public void completionOfDownload() {
+		String message = String.format("%s: Peer %d has downloaded the complete file.\n", simpleFormate.format(new Date()),
+				peerID);
+		loggerWrite(logFile, message);
+	}
+
+	private void loggerWrite(String logfile, String message) {
+		try {
+			// logWriter.log(null, msg);
+			File logger = new File(logfile);
+			if (!logger.exists()) {
+				logger.createNewFile();
+			}
+
+			FileOutputStream fout = new FileOutputStream(logger, true);
+			fout.write(message.getBytes());
+			fout.flush();
+			fout.close();
+			/*
+			 * Date newdate = new Date( ); SimpleDateFormat simpleFormate = new
+			 * SimpleDateFormat ("HH:mm:ss"); String curTime =
+			 * simpleFormate.format(newdate); FileWriter fileWrite = new FileWriter(logFile,
+			 * true); fileWrite.write(curTime + ": Peer " + peerID + message + "\n");
+			 * fileWrite.flush(); fileWrite.close();
+			 */
+		} catch (IOException exc) {
+			exc.printStackTrace();
+		}
+	}
 
 }
-
 

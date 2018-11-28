@@ -9,25 +9,25 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server implements Runnable {
-	private ExecutorService inThreadPool;
-	private int serverPort;
-	private ServerSocket serverSocket;
-	private Thread runningThread;
+	private ExecutorService incomingPeersThread;
+	private int portOfServer;
+	private ServerSocket socketofServerReference;
+	private Thread activeThread;
 
 	Server() {
-		this.runningThread = null;
-		this.serverPort = Peer.getPeerInstance().get_port();
-		inThreadPool = Executors.newFixedThreadPool(Peer.getPeerInstance().peersToExpectConnectionsFrom.size());
+		this.activeThread = null;
+		this.portOfServer = Peer.getPeerInstance().get_port();
+		incomingPeersThread = Executors.newFixedThreadPool(Peer.getPeerInstance().peersToExpectConnectionsFrom.size());
 	}
 
 	@Override
 	public void run() {
 		System.out.println("Spawned the SERVER super thread");
 		synchronized (this) {
-			this.runningThread = Thread.currentThread();
+			this.activeThread = Thread.currentThread();
 		}
 		try {
-			this.serverSocket = new ServerSocket(this.serverPort);
+			this.socketofServerReference = new ServerSocket(this.portOfServer);
 
 			for (Map.Entry<Integer, RemotePeerInfo> integerRemotePeerInfoEntry : Peer.getPeerInstance()
 					.getPeersToExpectConnectionsFrom().entrySet()) {
@@ -35,23 +35,23 @@ public class Server implements Runnable {
 
 				try {
 					// System.out.println("in iterator");
-					clientSocket = serverSocket.accept();
-					this.inThreadPool
+					clientSocket = socketofServerReference.accept();
+					this.incomingPeersThread
 							.execute(new IncomingReqHandler(clientSocket, integerRemotePeerInfoEntry.getValue()));
 				} catch (IOException e) {
 					throw new RuntimeException("Error accepting client connection", e);
 				}
 			}
-			this.inThreadPool.shutdown();
+			this.incomingPeersThread.shutdown();
 		} catch (IOException e) {
-			if (serverSocket != null && !serverSocket.isClosed()) {
+			if (socketofServerReference != null && !socketofServerReference.isClosed()) {
 				try {
-					serverSocket.close();
+					socketofServerReference.close();
 				} catch (IOException e1) {
 					e1.printStackTrace(System.err);
 				}
 			}
 		}
-		System.out.println("Server stopped");
+		// System.out.println("Server stopped");
 	}
 }

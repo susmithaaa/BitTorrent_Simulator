@@ -10,29 +10,29 @@ import com.OutgoingRequestHandler;
  * Author: @DilipKunderu
  */
 public class Client implements Runnable {
-	private ExecutorService outThreadPool;
-	private Map<Integer, RemotePeerInfo> peersToConnectTo;
-	private Thread runningThread;
+	private ExecutorService outgoingPeersThread;
+	private Map<Integer, RemotePeerInfo> connectToAbovePeers;
+	private Thread activeThread;
 
 	Client(Map<Integer, RemotePeerInfo> peersToConnectTo) {
-		this.peersToConnectTo = peersToConnectTo;
-		this.outThreadPool = Executors.newFixedThreadPool(this.peersToConnectTo.size());
+		this.connectToAbovePeers = peersToConnectTo;
+		this.outgoingPeersThread = Executors.newFixedThreadPool(this.connectToAbovePeers.size());
 	}
 
 	@Override
 	public void run() {
 		synchronized (this) {
-			this.runningThread = Thread.currentThread();
+			this.activeThread = Thread.currentThread();
 		}
-		for (Map.Entry<Integer, RemotePeerInfo> e : this.peersToConnectTo.entrySet()) {
-			RemotePeerInfo remote = e.getValue();
+		for (Map.Entry<Integer, RemotePeerInfo> e : this.connectToAbovePeers.entrySet()) {
+			RemotePeerInfo rem = e.getValue();
 			try {
-				this.outThreadPool.execute(new OutgoingRequestHandler(remote));
+				this.outgoingPeersThread.execute(new OutgoingRequestHandler(rem));
 			} catch (Exception ex) {
 				// throw new RuntimeException("Thread pool size exceeded", ex);
 			}
 		}
-		this.outThreadPool.shutdown();
+		this.outgoingPeersThread.shutdown();
 		// System.out.println("client stopped");
 	}
 }

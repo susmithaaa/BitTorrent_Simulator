@@ -19,7 +19,7 @@ class OutgoingRequestHandler implements Runnable {
 		PeerCommunication peerCommunication = null;
 		// try {
 		peerCommunication = new PeerCommunication(this.remotePeerInfo);
-		System.out.println("outgoing handler thread spawned for remote peer " + this.remotePeerInfo.get_peerID());
+		System.out.println("Outgoing handler thread spawned for remote peer " + this.remotePeerInfo.get_peerID());
 		peerProcess.log.TCPConnection(this.remotePeerInfo.get_peerID(), true);
 		// } catch (ClassNotFoundException e) {
 		// e.printStackTrace();
@@ -51,7 +51,7 @@ class IncomingReqHandler implements Runnable {
 		PeerCommunication peerCommunication = null;
 		try {
 			peerCommunication = new PeerCommunication(this.remotePeerInfo, this.clientSocket);
-			System.out.println("incoming request thread spawned for remote peer " + this.remotePeerInfo.get_peerID());
+			System.out.println("Incoming request thread spawned for remote peer " + this.remotePeerInfo.get_peerID());
 			peerProcess.log.TCPConnection(this.remotePeerInfo.get_peerID(), false);
 		} catch (ClassNotFoundException e) {
 			// e.printStackTrace();

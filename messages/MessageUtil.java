@@ -26,11 +26,11 @@ public class MessageUtil {
 
 	public static byte[] intToByteArray(int a) {
 		byte[] ret = new byte[4];
-		int _2 =  (255 & (a >> 8));
-		int _1 =  (255 & (a >> 16));
-		int _3 =  (255 & a);
-		int _0 =  (255 & (a >> 24));
-		
+		int _2 = (255 & (a >> 8));
+		int _1 = (255 & (a >> 16));
+		int _3 = (255 & a);
+		int _0 = (255 & (a >> 24));
+
 		ret[2] = (byte) _2;
 		ret[1] = (byte) _1;
 		ret[3] = (byte) _3;
@@ -41,7 +41,7 @@ public class MessageUtil {
 	public static int byteArrayToInt(byte[] b) {
 		int value = 0;
 		for (int i = 0; i < 4; i++) {
-			int shift = (4 - i -1) * 8;
+			int shift = (4 - i - 1) * 8;
 			value += (255 & b[i]) << shift;
 		}
 		return value;
@@ -92,32 +92,28 @@ public class MessageUtil {
 
 	public static byte[] removeFourBytes(byte[] a) {
 		byte[] actualPayload = new byte[a.length - 4];
-		/*for (int i = 4; i < a.length; i++) {
-			actualPayload[i - 4] = a[i];
-			a[i - 4] = a[i];
-		}*/
-		
-		 System.arraycopy(a, 4, actualPayload, 0, a.length-4);
-		
+		/*
+		 * for (int i = 4; i < a.length; i++) { actualPayload[i - 4] = a[i]; a[i - 4] =
+		 * a[i]; }
+		 */
+
+		System.arraycopy(a, 4, actualPayload, 0, a.length - 4);
+
 		return actualPayload;
 	}
 
-	static void copyArrayFixed(byte[] res, byte[] first)
-	{
+	static void copyArrayFixed(byte[] res, byte[] first) {
 		// return new byte[5];
 		System.arraycopy(first, 0, res, 0, first.length);
 	}
-	
-	static void copyArrayVariable(byte[] res, byte[] second, int first_length)
-	{
+
+	static void copyArrayVariable(byte[] res, byte[] second, int first_length) {
 		System.arraycopy(second, 0, res, first_length, second.length);
 	}
-	
-	/*public static byte[] getPieceIndexFromPayload(byte[] a) {
-		byte[] pieceIndex = new byte[4];
-		for (int i = 0; i < 4; i++) {
-			pieceIndex[i] = a[i];
-		}
-		return pieceIndex;
-	}*/
+
+	/*
+	 * public static byte[] getPieceIndexFromPayload(byte[] a) { byte[] pieceIndex =
+	 * new byte[4]; for (int i = 0; i < 4; i++) { pieceIndex[i] = a[i]; } return
+	 * pieceIndex; }
+	 */
 }

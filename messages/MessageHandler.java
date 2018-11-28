@@ -38,20 +38,7 @@ public class MessageHandler {
 		} else {
 			throw new Exception("Invalid message " + message_type);
 		}
-
-		/*
-		 * switch (this.message_type) { // if(MessageType.choke==this.message_type)
-		 * 
-		 * 
-		 * case choke: { message = new Choke(); break; } case unchoke: { message = new
-		 * UnChoke(); break; } case interested: { message = new Interested(); break; }
-		 * case notinterested: { message = new NotInterested(); break; } case have: {
-		 * message = new Have(this.messagePayload); break; } case bitfield: { message =
-		 * new BitField(this.messagePayload); break; } case request: { message = new
-		 * Request(this.messagePayload); break; } case piece: { message = new
-		 * Piece(this.messagePayload); break; } default: { throw new
-		 * Exception("Not a valid message type: " + message_type); } }
-		 */
+		
 		return message;
 	}
 
