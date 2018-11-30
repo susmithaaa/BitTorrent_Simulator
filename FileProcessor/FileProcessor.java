@@ -20,13 +20,7 @@ public class FileProcessor {
 
 		return resultPart;
 	}
-
-	public void receivePartOfFile(MessageContent msg, int fileChunk) {
-		byte[] msgPayLoadWithIndex = msg.getPayloadOfMessage();
-		byte[] msgPayLoad = MessageHelper.trimFourBytes(msgPayLoadWithIndex, 4);
-		trackReceivedFilePieces.put(fileChunk, msgPayLoad);
-	}
-
+	
 	public void combineFile() throws IOException {
 		FileOutputStream fOS;
 		byte[] integratedFile = new byte[Defaults.sizeOfFile];
@@ -46,4 +40,12 @@ public class FileProcessor {
 		fOS.flush();
 		fOS.close();
 	}
+
+	public void receivePartOfFile(MessageContent msg, int fileChunk) {
+		byte[] msgPayLoadWithIndex = msg.getPayloadOfMessage();
+		byte[] msgPayLoad = MessageHelper.trimFourBytes(msgPayLoadWithIndex, 4);
+		trackReceivedFilePieces.put(fileChunk, msgPayLoad);
+	}
+
+	
 }
