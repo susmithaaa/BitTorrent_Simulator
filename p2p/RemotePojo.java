@@ -8,7 +8,7 @@ import java.io.ObjectOutputStream;
 
 public class RemotePojo implements Comparable<RemotePojo> {
 	private String peerHostName;
-    private TypeOfMessage currState;
+    private MessageType currState;
 	private int idOfPeer;
 	public ObjectOutputStream oOS;
 	private BitSet remotePeerBitfield;
@@ -17,11 +17,11 @@ public class RemotePojo implements Comparable<RemotePojo> {
 	private long consumptionRate;
 
 
-	public TypeOfMessage getcurrState() {
+	public MessageType getcurrState() {
 		return currState;
 	}
 
-	public void setCurrState(TypeOfMessage state) {
+	public void setCurrState(MessageType state) {
 		this.currState = state;
 	}
 
@@ -79,7 +79,7 @@ public class RemotePojo implements Comparable<RemotePojo> {
 		this.peerHostName = _hostName;
 		this.remotePeerPortNo = _portNo;
 		this.remotePeerHasFile = _hasFile;
-		TypeOfMessage msg = TypeOfMessage.choke;
+		MessageType msg = MessageType.choke;
 		this.idOfPeer = _peerID;
 		this.remotePeerBitfield = new BitSet(Peer.getPeerObj().peerCountPieces);
 		this.currState = msg;

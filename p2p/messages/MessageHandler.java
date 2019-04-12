@@ -1,6 +1,6 @@
-package com.messages;
+package p2p.messages;
 
-import com.MessageType;
+import p2p.MessageType;
 //import com.model.*;
 
 public class MessageHandler {

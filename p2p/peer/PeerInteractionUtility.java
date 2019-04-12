@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import p2p.RemotePojo;
-import p2p.TypeOfMessage;
+import p2p.MessageType;
 import p2p.peerProcess;
 import p2p.FileProcessor.FileProcessor;
 import p2p.coreMessagePackage.MessageContent;
@@ -14,21 +14,21 @@ import p2p.coreMessagePackage.MessageHelper;
 
 public class PeerInteractionUtility {
 
-	public MessageContent sendwithoutPayloadMessages(ObjectOutputStream objOut, int i, TypeOfMessage msgType) throws Exception {
+	public MessageContent sendwithoutPayloadMessages(ObjectOutputStream objOut, int i, MessageType msgType) throws Exception {
 		MessageContent mess = null;
-		if(msgType == TypeOfMessage.choke)
+		if(msgType == MessageType.choke)
 		{
 			mess = new MessageContent((byte) 0, null);
 		}
-		else if(msgType == TypeOfMessage.unchoke)
+		else if(msgType == MessageType.unchoke)
 		{
 			mess = new MessageContent((byte) 1, null);
 		}
-		else if(msgType == TypeOfMessage.interested)
+		else if(msgType == MessageType.interested)
 		{
 			mess = new MessageContent((byte) 2, null);
 		}
-		else if(msgType == TypeOfMessage.notinterested)
+		else if(msgType == MessageType.notinterested)
 		{
 			mess = new MessageContent((byte) 3, null);
 		}
@@ -63,7 +63,7 @@ public class PeerInteractionUtility {
 		return mess;
 	}
 
-	public MessageContent sendMessagePiece(ObjectOutputStream objOut, TypeOfMessage msgType,int pieceId, int x, FileProcessor filemanagerObj)
+	public MessageContent sendMessagePiece(ObjectOutputStream objOut, MessageType msgType, int pieceId, int x, FileProcessor filemanagerObj)
 			throws Exception {
 		byte[] payload = MessageHelper.combineByteArrays(MessageHelper.convIntByteArray(pieceId), filemanagerObj.getFilePart(pieceId));
 		MessageContent mess = new MessageContent((byte) 7, payload); 

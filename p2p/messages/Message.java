@@ -1,4 +1,4 @@
-package com.messages;
+package p2p.messages;
 
 import java.io.Serializable;
 // import java.util.Arrays;

@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.BitSet;
 
 import p2p.RemotePojo;
-import p2p.TypeOfMessage;
+import p2p.MessageType;
 import p2p.peerProcess;
 import p2p.FileProcessor.FileProcessor;
 import p2p.coreMessagePackage.MessageContent;
@@ -121,7 +121,7 @@ public class PeerInteraction {
 				int convertedVal = MessageHelper.convByteArrayInt(msgPayloadReceived);
 				r.getremotePeerBitfield().set(convertedVal);
 				if (!refPeer.fetchSetofBits().get(convertedVal)) {
-					helperforPeerCommunication.sendwithoutPayloadMessages(this.outputStreamReference, 0, TypeOfMessage.interested);
+					helperforPeerCommunication.sendwithoutPayloadMessages(this.outputStreamReference, 0, MessageType.interested);
 				}
 				break;
 			}
@@ -132,7 +132,7 @@ public class PeerInteraction {
 			}
 
 			case (byte) 6: {
-				helperforPeerCommunication.sendMessagePiece(this.outputStreamReference, TypeOfMessage.piece,
+				helperforPeerCommunication.sendMessagePiece(this.outputStreamReference, MessageType.piece,
 						MessageHelper.convByteArrayInt(msgPayloadReceived), 5, this.managerFile);
 				break;
 			}
@@ -161,7 +161,7 @@ public class PeerInteraction {
 		}
 		else
 		{
-			helperforPeerCommunication.sendwithoutPayloadMessages(this.outputStreamReference, 0, TypeOfMessage.notinterested);
+			helperforPeerCommunication.sendwithoutPayloadMessages(this.outputStreamReference, 0, MessageType.notinterested);
 		}
 	}
 
@@ -171,9 +171,9 @@ public class PeerInteraction {
 		boolean res = helperforPeerCommunication.checkIfInterested(r.getremotePeerBitfield(),
 				pRef.fetchSetofBits(), 0);
 		if (!res) {
-			helperforPeerCommunication.sendwithoutPayloadMessages(this.outputStreamReference, 0, TypeOfMessage.notinterested);
+			helperforPeerCommunication.sendwithoutPayloadMessages(this.outputStreamReference, 0, MessageType.notinterested);
 		} else {
-			helperforPeerCommunication.sendwithoutPayloadMessages(this.outputStreamReference, 0, TypeOfMessage.interested);
+			helperforPeerCommunication.sendwithoutPayloadMessages(this.outputStreamReference, 0, MessageType.interested);
 		}
 	}
 

@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import p2p.Defaults;
 import p2p.RemotePojo;
-import p2p.TypeOfMessage;
+import p2p.MessageType;
 import p2p.peerProcess;
 
 public class Peer {
@@ -139,8 +139,8 @@ public class Peer {
 			try {
 				List<RemotePojo> remotePeerKeySet = new ArrayList<>(this.likedNeighbours.keySet());
 				if (remotePeerKeySet.indexOf(this.optUnchNeighbour) == -1) {
-					helperObj.sendwithoutPayloadMessages(this.optUnchNeighbour.oOS, 0, TypeOfMessage.choke);
-					this.optUnchNeighbour.setCurrState(TypeOfMessage.choke);
+					helperObj.sendwithoutPayloadMessages(this.optUnchNeighbour.oOS, 0, MessageType.choke);
+					this.optUnchNeighbour.setCurrState(MessageType.choke);
 				}
 
 			} catch (Exception e) {
@@ -148,8 +148,8 @@ public class Peer {
 			}
 
 			try {
-				helperObj.sendwithoutPayloadMessages(pOptimistic.oOS, 0, TypeOfMessage.unchoke);
-				pOptimistic.setCurrState(TypeOfMessage.unchoke);
+				helperObj.sendwithoutPayloadMessages(pOptimistic.oOS, 0, MessageType.unchoke);
+				pOptimistic.setCurrState(MessageType.unchoke);
 
 			} catch (Exception e) {
 				// e.printStackTrace();
@@ -304,14 +304,14 @@ public class Peer {
 
 	private void arbitratorMethod(int x, RemotePojo remoteOne) {
 		if (remoteOne != null) {
-			if (remoteOne.getcurrState() == TypeOfMessage.choke) 
+			if (remoteOne.getcurrState() == MessageType.choke)
 			{
 				int count = 0;
 				for (int i = 0; i < x; i++)
 					count++;
 				try {
-					helperObj.sendwithoutPayloadMessages(remoteOne.oOS, 0, TypeOfMessage.unchoke);
-					remoteOne.setCurrState(TypeOfMessage.unchoke);
+					helperObj.sendwithoutPayloadMessages(remoteOne.oOS, 0, MessageType.unchoke);
+					remoteOne.setCurrState(MessageType.unchoke);
 					System.out.println("Message Unchoke sent to " + remoteOne.getidOfPeer() + " from the peer "
 							+ Peer.getPeerObj().getIdOfPeer());
 				} catch (Exception ex) {
@@ -323,8 +323,8 @@ public class Peer {
 
 	private void performChokeOperation(String dem, RemotePojo remoteOne) {
 		try {
-			helperObj.sendwithoutPayloadMessages(remoteOne.oOS, 0, TypeOfMessage.choke);
-			remoteOne.setCurrState(TypeOfMessage.choke);
+			helperObj.sendwithoutPayloadMessages(remoteOne.oOS, 0, MessageType.choke);
+			remoteOne.setCurrState(MessageType.choke);
 			System.out
 					.println("choke sent to" + remoteOne.getidOfPeer() + "from" + Peer.getPeerObj().getIdOfPeer());
 			if (this.peersCurrentlyChoked.indexOf(remoteOne) == -1)

@@ -1,4 +1,4 @@
-package com.messages;
+package p2p.messages;
 
 import java.io.*;
 // import com.Constants;
